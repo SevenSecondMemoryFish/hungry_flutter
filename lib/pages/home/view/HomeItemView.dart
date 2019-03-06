@@ -75,8 +75,10 @@ class _HomeItemViewStatus extends State<HomeItemView> {
               new Container(
                   width: 80,
                   height: 80,
-                  child: ImageTool.image(NetworkApi.BaseImgURL + widget.merchantModel.image_path,
-                      fit: BoxFit.cover)
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    child: ImageTool.image(NetworkApi.BaseImgURL + widget.merchantModel.image_path,fit: BoxFit.cover),
+                  )
                       ),
               new Expanded(
                   child: new Padding(

@@ -1,6 +1,7 @@
 
 
 class StoreFoodMenuModel {
+
   String name;
   String description;
   String icon_url;
@@ -52,6 +53,7 @@ class FoodModel {
   String rating_count;
   String month_sales;
   String is_featured;
+  int buyNumber = 0;
   ActivityBean activity;
   List<AttributesListBean> attributes;
   List<SpecfoodsListBean> specfoods;

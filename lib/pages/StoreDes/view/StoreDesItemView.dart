@@ -5,6 +5,7 @@ import 'package:hungry_flutter/service/NetworkApi.dart';
 import 'package:hungry_flutter/model/StoreFoodMenuModel.dart';
 import 'package:hungry_flutter/tools/color/ColorTool.dart';
 import 'package:hungry_flutter/tools/image/ImageTool.dart';
+import 'package:hungry_flutter/tools/evenBus/EvenBusTool.dart';
 class StoreDesItemView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new _StoreDesItemStatus();
@@ -17,8 +18,6 @@ class StoreDesItemView extends StatefulWidget {
 }
 
 class _StoreDesItemStatus extends State<StoreDesItemView>{
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +39,7 @@ class _StoreDesItemStatus extends State<StoreDesItemView>{
         Container(
           width: 50,
           height: 50,
-          child: ImageTool.image( NetworkApi.BaseImgURL+foodModel.image_path)
+          child: ClipRRect(borderRadius: BorderRadius.all(Radius.circular(5)),child: ImageTool.image( NetworkApi.BaseImgURL+foodModel.image_path),)
         ),
         Expanded(
             child:Padding(padding: EdgeInsets.only(left: 10),child: Column(
@@ -50,8 +49,7 @@ class _StoreDesItemStatus extends State<StoreDesItemView>{
                 Text(foodModel.description,style: TextStyle(fontSize: 12,color: Colors.black54),),
                 Padding(padding: EdgeInsets.only(top: 3),child: Text("月售"+foodModel.month_sales +" 好评率" + foodModel.satisfy_rate,style: TextStyle(fontSize: 12,color: Colors.black87)),),
                 FoodAttributesView(foodModel: foodModel,),
-              
-                FoodSelectView()
+                FoodSelectView(foodModel),
               ],
             ),)
         )
@@ -106,7 +104,17 @@ class FoodAttributesView extends StatelessWidget {
 //    );
   }
 }
-class FoodSelectView extends StatelessWidget {
+class FoodSelectView extends StatefulWidget {
+
+  FoodSelectView(this._foodModel,{Key key}):super(key:key);
+
+  FoodModel _foodModel;
+  @override
+  State<StatefulWidget> createState() => _FoodSelectView();
+
+}
+
+class _FoodSelectView extends State<FoodSelectView>{
   @override
   Widget build(BuildContext context) {
 
@@ -117,7 +125,36 @@ class FoodSelectView extends StatelessWidget {
         Text("￥20",style: TextStyle(color: Colors.redAccent,fontSize: 14,fontWeight: FontWeight.bold),),
         Row(
           children: <Widget>[
-            Image.asset("assets/images/add@2x.png",width: 30,height: 30,),
+            Offstage(
+              offstage: widget._foodModel.buyNumber <= 0,
+              child: Row(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: (){
+                      sendNotification(context);
+                      setState(() {
+                        widget._foodModel.buyNumber = widget._foodModel.buyNumber - 1;
+                      });
+                    },
+                    child: Image.asset("assets/images/reduction@2x.png",width: 28,height: 28,),
+                  ),
+                  Container(
+                    width: 30,
+                    child: Text(widget._foodModel.buyNumber.toString(),style: TextStyle(fontSize: 12,color: Colors.grey,),textAlign: TextAlign.center,),
+                  )
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: (){
+                sendNotification(context);
+                setState(() {
+                  widget._foodModel.buyNumber = widget._foodModel.buyNumber + 1;
+                });
+              },
+              child: Image.asset("assets/images/add@2x.png",width: 30,height: 30,),
+            )
+
           ],
         ),
 //        Image.asset("assets/images/add@2x.png",width: 30,height: 30,),
@@ -126,6 +163,18 @@ class FoodSelectView extends StatelessWidget {
     );
   }
 
+  void sendNotification(BuildContext context){
+    print("send");
+    eventBus.fire(StoreDesEvenBus("send"));
+    FoodNumberNotification("Hi").dispatch(context);
+  }
+
+
+}
+
+class FoodNumberNotification extends Notification {
+  FoodNumberNotification(this.msg);
+  final String msg;
 }
 
 

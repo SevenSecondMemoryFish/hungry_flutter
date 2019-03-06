@@ -10,7 +10,7 @@ import 'package:hungry_flutter/service/NetworkService.dart';
 import 'package:hungry_flutter/model/StoreFoodModel.dart';
 import 'package:hungry_flutter/model/StoreFoodMenuModel.dart';
 import 'package:hungry_flutter/tools/color/ColorTool.dart';
-
+import 'package:hungry_flutter/pages/StoreDes/view/StoreDesTypeView.dart';
 class StoreDes extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => new _StoreDes();
@@ -18,14 +18,16 @@ class StoreDes extends StatefulWidget{
   StoreDes({Key key,this.merchantModel}):super(key:key);
 
   final HomeMerchantModel merchantModel;
-  
+
 }
 class _StoreDes extends State<StoreDes> with SingleTickerProviderStateMixin{
-
 
   ScrollController _scrollController = ScrollController();
 
   int tapIndex = 0;
+  /// 商品和评价切换 类型
+  bool _foodType = true;
+
   List<StoreFoodMenuModel> foodModelList = new List();
   @override
   void initState() {
@@ -35,9 +37,15 @@ class _StoreDes extends State<StoreDes> with SingleTickerProviderStateMixin{
         print(_scrollController.offset); //打印滚动位置
     });
   }
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
 
   void networkFoods(BuildContext context){
-    
+
     NetworkService.instance.get(NetworkApi.SHOPFOODMENU, {"restaurant_id":widget.merchantModel.id.toString()}, (data){
       setState(() {
         foodModelList = StoreFoodMenuModel.fromMapList(data);
@@ -45,7 +53,7 @@ class _StoreDes extends State<StoreDes> with SingleTickerProviderStateMixin{
     }, (error){
 
     });
-    
+
     String url = NetworkApi.STODEFOODURL + widget.merchantModel.id.toString()+"/ratings";
     NetworkService.instance.get(url, {"latitude":widget.merchantModel.latitude.toString(),"longitude":widget.merchantModel.longitude.toString()}, (data){
 
@@ -53,6 +61,12 @@ class _StoreDes extends State<StoreDes> with SingleTickerProviderStateMixin{
     }, (error){
 
     });
+  }
+
+  foodType(bool type){
+   setState(() {
+     _foodType = type;
+   });
   }
 
 
@@ -72,80 +86,77 @@ class _StoreDes extends State<StoreDes> with SingleTickerProviderStateMixin{
                color: Colors.white,
                child:  new Column(
                  children: <Widget>[
-                  new Container(
-                    height: 50,
-                    color: Colors.blue,
-                    child:  new Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                   StoreDesTypeView(foodType),
+
+                  Offstage(
+                    offstage: !_foodType,
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          new Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[new Text("商品",style: new TextStyle(fontSize: 14),),new Container(color: Colors.red,height: 2,width: 30,margin: EdgeInsets.only(top: 5),),],
+                          Container(
+                            height: MediaQuery.of(context).size.height-120-50-50,
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  width: 80,
+                                  padding: EdgeInsets.all(0),
+                                  child: new ListView.separated(
+                                    padding: EdgeInsets.all(0),
+                                    addRepaintBoundaries:false,
+                                    itemCount: foodModelList.length,
+                                    itemBuilder: (BuildContext context,int index){
+                                      return GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            tapIndex = index;
+                                          });
+                                        },
+                                        behavior:HitTestBehavior.translucent,
+                                        child: Container(
+                                          width: 80,
+                                          height: 50,
+                                          color: index == tapIndex ? Colors.white:ColorTool.hexColor("#f5f5f5"),
+                                          child: Row(
+                                            children: <Widget>[
+                                              Container(color: index == tapIndex ? Colors.red:ColorTool.hexColor("#f5f5f5"),width: 2,height: 50,),
+                                              Expanded(child:Padding(padding: EdgeInsets.only(left: 5),child:  Text(foodModelList[index].name,overflow: TextOverflow.clip,maxLines: 1,),),)
+                                            ],
+                                          ),),);
+                                    },
+                                    separatorBuilder: (BuildContext context, int index) {
+                                      return Divider(color: Colors.grey,height: 1,);
+                                    },
+                                  ),),
+                                Container(
+                                  width: MediaQuery.of(context).size.width - 80,
+                                  child: new ListView.builder(
+                                    padding: EdgeInsets.all(0),
+                                    itemCount: foodModelList.length,
+                                    controller: _scrollController,
+                                    itemBuilder: (BuildContext context,int index){
+                                      return StoreDesItemView(foodSectionModel: foodModelList[index],);
+                                    },
+                                  ),),
+                              ],),
                           ),
-                            new Column(
-                              mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[new Text("评价",style: new TextStyle(fontSize: 14)),new Container(color: Colors.red,height: 2,width: 30,margin: EdgeInsets.only(top: 5)),],
+                          Container(
+                            height: 50,
+                            width: MediaQuery.of(context).size.width,
+                            child: StoreDesFooterView(foodModelList),
                           )
-                        ],
+                        ],),
                     ),
                   ),
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          height: MediaQuery.of(context).size.height-120-50-50,
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 80,
-                                padding: EdgeInsets.all(0),
-                                child: new ListView.separated(
-                                  padding: EdgeInsets.all(0),
-                                  addRepaintBoundaries:false,
-                                  itemCount: foodModelList.length,
-                                  itemBuilder: (BuildContext context,int index){
-                                    return GestureDetector(
-                                      onTap: (){
-                                        setState(() {
-                                          tapIndex = index;
-                                        });
-                                      },
-                                      behavior:HitTestBehavior.translucent,
-                                      child: Container(
-                                        width: 80,
-                                        height: 50,
-                                        color: index == tapIndex ? Colors.white:ColorTool.hexColor("#f5f5f5"),
-                                        child: Row(
-                                        children: <Widget>[
-                                        Container(color: index == tapIndex ? Colors.red:ColorTool.hexColor("#f5f5f5"),width: 2,height: 50,),
-                                        Expanded(child:Padding(padding: EdgeInsets.only(left: 5),child:  Text(foodModelList[index].name,overflow: TextOverflow.clip,maxLines: 1,),),)
-                                      ],
-                                    ),),);
-                                  },
-                                  separatorBuilder: (BuildContext context, int index) {
-                                    return Divider(color: Colors.grey,height: 1,);
-                                  },
-                                ),),
-                              Container(
-                                width: MediaQuery.of(context).size.width - 80,
-                                child: new ListView.builder(
-                                  padding: EdgeInsets.all(0),
-                                  itemCount: foodModelList.length,
-                                  controller: _scrollController,
-                                  itemBuilder: (BuildContext context,int index){
-                                    return StoreDesItemView(foodSectionModel: foodModelList[index],);
-                                  },
-                                ),),
-                          ],),
-                        ),
-                        Container(
-                          height: 50,
-                          width: MediaQuery.of(context).size.width,
-                          child: StoreDesFooterView(),
-                        )
-                      ],),
-                  )
+                   Offstage(
+                     offstage: _foodType,
+                     child: Container(
+                       height: 200,
+                       child: Center(
+                         child: Text("我不想去写了，你帮我去写吧",style: TextStyle(fontSize: 14,color: Colors.red),),
+                       ),
+                     ),
+                   )
                  ],
                ),
              )
