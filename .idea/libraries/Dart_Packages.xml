@@ -429,6 +429,13 @@
             </list>
           </value>
         </entry>
+        <entry key="sticky_headers">
+          <value>
+            <list>
+              <option value="/Library/flutter/.pub-cache/hosted/pub.dartlang.org/sticky_headers-0.1.7/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="stream_channel">
           <value>
             <list>
@@ -595,6 +602,7 @@
       <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.4.1/lib" />
       <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-1.1.1/lib" />
       <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/stack_trace-1.9.3/lib" />
+      <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/sticky_headers-0.1.7/lib" />
       <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/stream_channel-1.6.8/lib" />
       <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/stream_transform-0.0.14+1/lib" />
       <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/string_scanner-1.0.4/lib" />

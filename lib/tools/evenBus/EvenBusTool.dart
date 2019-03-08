@@ -6,3 +6,8 @@ class StoreDesEvenBus {
   String msg;
   StoreDesEvenBus(this.msg);
 }
+class StoreLeftViewEvenBus{
+  String msg;
+  int tapIndex;
+  StoreLeftViewEvenBus(this.msg,this.tapIndex);
+}
